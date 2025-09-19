@@ -1,38 +1,46 @@
 package org.example.user;
 
+import org.example.Model.User;
 import org.example.database.interfaces.IUserDatabase;
 
 import java.io.PrintWriter;
+import java.util.Map;
 
-public class LoginAuthentification {
+public class LoginAuthentification implements ILoginAuthentification {
 
+    private final Map<Integer, User> userMap;
     private final IUserDatabase userDatabase;
 
-    public LoginAuthentification(IUserDatabase userDatabase) {
+
+    public LoginAuthentification(Map<Integer, User> userMap, IUserDatabase userDatabase) {
+        this.userMap = userMap;
         this.userDatabase = userDatabase;
     }
 
     public void handleLogin(String username, String password, PrintWriter printWriter) {
-
-        // Tjekker først om felterne er udfyldt
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             printWriter.println("Error: Username and password cannot be empty");
             return;
         }
 
-        // Herefter forsøger vi at autentificere brugeren, er det success kommer du igennem
         boolean success = userDatabase.authenticateUser(username, password);
         if (success) {
-            printWriter.println("Login successful");
-            org.example.Util.SimpleLogger.log("User logged in: " + username);
+            int id = userDatabase.getUserIdByUsername(username);
+            User user = userDatabase.getUserById(id);
+
+            if (user != null) {
+                userMap.put(id, user);
+                printWriter.println("Login successful");
+                org.example.Util.SimpleLogger.log("User logged in: " + username);
+            } else {
+                printWriter.println("Error: User not found after authentication");
+                org.example.Util.SimpleLogger.log("Authenticated user not found in database: " + username);
+            }
         } else {
             printWriter.println("Error: Invalid username or password");
             org.example.Util.SimpleLogger.log("Failed login attempt for user: " + username);
         }
     }
-
-
-    // Samme princip med registrering af brugere. Hurtigt tjek om tingene er iorden, derefter opretter vi brugeren
 
     public void handleRegister(String username, String password, PrintWriter printWriter) {
 
@@ -56,7 +64,15 @@ public class LoginAuthentification {
         }
     }
 
-    public void handleLogout() {
-        if ()
+
+    public void handleLogout(String username, PrintWriter printWriter) {
+        if (username == null || username.isEmpty()) {
+            printWriter.println("Error: Username cannot be empty");
+            return;
+        }
+
+        userMap.values().removeIf(user -> user.getUsername().equals(username));
+        printWriter.println("Logout successful");
+        org.example.Util.SimpleLogger.log("User logged out: " + username);
     }
 }

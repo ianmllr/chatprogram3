@@ -1,5 +1,7 @@
 package org.example.database.interfaces;
 
+import org.example.database.tables.MessageHistoryDatabase;
+
 import java.util.List;
 
 public interface IMessageHistoryDatabase {

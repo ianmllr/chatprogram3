@@ -34,7 +34,7 @@ public class MessageHistoryDatabase implements IMessageHistoryDatabase {
 
     @Override
     public boolean saveMessage(String senderId, String messageType, String payload) {
-        String sql = "INSERT INTO message_history (sender_id, message_type, payload) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO message_history (sender_id, message_type, payload, timestamp) VALUES (?, ?, ?, ?)";
         try (Connection conn = dbConfig.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 

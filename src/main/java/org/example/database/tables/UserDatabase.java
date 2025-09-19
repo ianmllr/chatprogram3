@@ -1,5 +1,6 @@
 package org.example.database.tables;
 
+import org.example.Model.User;
 import org.example.database.interfaces.IUserDatabase;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -79,4 +80,48 @@ public class UserDatabase implements IUserDatabase {
             throw new RuntimeException(e);
         }
     }
+
+    public User getUserById(int id) {
+        String sql = "SELECT id, username, password FROM users WHERE id = ?";
+        try (Connection conn = dbConfig.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+
+            statement.setInt(1, id);
+            ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                String username = result.getString("username");
+                String password = result.getString("password");
+                return new User(id, username, password);
+            }
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public int getUserIdByUsername(String username) {
+        String sql = "SELECT id FROM users WHERE username = ?";
+        try (Connection conn = dbConfig.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+
+            statement.setString(1, username);
+            ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                return result.getInt("id");
+            }
+            return -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+
+
+
+
+
 }

@@ -3,7 +3,9 @@ package org.example.server;
 
 import org.example.Model.User;
 import org.example.Util.ConfigLoader;
+import org.example.user.LoginAuthentification;
 import org.example.util.ClientHandler;
+import org.example.util.MessageHandler;
 
 import java.io.*;
 import java.net.*;
@@ -27,7 +29,9 @@ public class Server {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (true) {
                 Socket socket = serverSocket.accept();
-                threadPool.submit(new ClientHandler(socket, userMap));
+                MessageHandler messageHandler = new MessageHandler(userMap);
+                LoginAuthentification loginAuth = new LoginAuthentification(userMap);
+                threadPool.submit(new ClientHandler(socket, messageHandler, loginAuth));
             }
         } catch (IOException ex) {
             ex.printStackTrace();
