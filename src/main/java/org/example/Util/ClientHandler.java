@@ -1,6 +1,6 @@
-package org.example.util;
+package org.example.Util;
 
-import org.example.user.LoginAuthentification;
+import org.example.User.LoginAuthentification;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

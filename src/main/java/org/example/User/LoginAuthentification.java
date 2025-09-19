@@ -1,7 +1,7 @@
-package org.example.user;
+package org.example.User;
 
 import org.example.Model.User;
-import org.example.database.interfaces.IUserDatabase;
+import org.example.Database.Interfaces.IUserDatabase;
 
 import java.io.PrintWriter;
 import java.util.Map;

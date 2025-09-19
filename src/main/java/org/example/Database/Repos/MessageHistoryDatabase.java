@@ -1,15 +1,15 @@
-package org.example.database.tables;
+package org.example.Database.Repos;
 
-import org.example.database.interfaces.IMessageHistoryDatabase;
+import org.example.Database.Interfaces.IMessageHistoryDatabase;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MessageHistoryDatabase implements IMessageHistoryDatabase {
 
-    private final org.example.database.tables.IDatabaseConfig dbConfig;
+    private final org.example.Database.Repos.IDatabaseConfig dbConfig;
 
-    public MessageHistoryDatabase(org.example.database.tables.IDatabaseConfig dbConfig) {
+    public MessageHistoryDatabase(org.example.Database.Repos.IDatabaseConfig dbConfig) {
         this.dbConfig = dbConfig;
     }
 

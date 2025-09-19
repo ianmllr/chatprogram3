@@ -1,4 +1,4 @@
-package org.example.database.interfaces;
+package org.example.Database.Interfaces;
 
 import org.example.Model.User;
 

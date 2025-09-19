@@ -1,16 +1,16 @@
-package org.example.database.tables;
+package org.example.Database.Repos;
 
 import org.example.Model.User;
-import org.example.database.interfaces.IUserDatabase;
+import org.example.Database.Interfaces.IUserDatabase;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
 public class UserDatabase implements IUserDatabase {
 
-    private final org.example.database.tables.IDatabaseConfig dbConfig;
+    private final org.example.Database.Repos.IDatabaseConfig dbConfig;
 
-    public UserDatabase(org.example.database.tables.IDatabaseConfig dbConfig) {
+    public UserDatabase(org.example.Database.Repos.IDatabaseConfig dbConfig) {
         this.dbConfig = dbConfig;
     }
 
@@ -82,7 +82,7 @@ public class UserDatabase implements IUserDatabase {
     }
 
     public User getUserById(int id) {
-        String sql = "SELECT id, username, password FROM users WHERE id = ?";
+        String sql = "SELECT id, username FROM users WHERE id = ?";
         try (Connection conn = dbConfig.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 
@@ -91,8 +91,7 @@ public class UserDatabase implements IUserDatabase {
 
             if (result.next()) {
                 String username = result.getString("username");
-                String password = result.getString("password");
-                return new User(id, username, password);
+                return new User(id, username);
             }
             return null;
         } catch (SQLException e) {

@@ -1,8 +1,8 @@
-package org.example.database.interfaces;
+package org.example.Database.Interfaces;
 
-import org.example.database.tables.MessageHistoryDatabase;
+import org.example.Database.Repos.MessageHistoryDatabase;
 
-import java.util.List;
+import java.Util.List;
 
 public interface IMessageHistoryDatabase {
     boolean saveMessage(String senderId, String messageType, String payload);

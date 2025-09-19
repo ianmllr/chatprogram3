@@ -1,7 +1,6 @@
-package org.example.user;
+package org.example.User;
 
 import java.io.PrintWriter;
-import org.example.user.LoginAuthentification;
 
 
 public interface ILoginAuthentification {

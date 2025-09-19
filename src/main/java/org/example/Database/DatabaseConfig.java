@@ -1,4 +1,4 @@
-package org.example.database.tables;
+package org.example.Database;
 
 import org.example.Util.ConfigLoader;
 
@@ -7,7 +7,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DatabaseConfig implements org.example.database.tables.IDatabaseConfig {
+public class DatabaseConfig implements org.example.Database.Repos.IDatabaseConfig {
     private final String DB_HOST;
     private final String DB_PORT;
     private final String DB_NAME;
