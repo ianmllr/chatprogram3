@@ -4,6 +4,7 @@ import org.example.Model.User;
 import org.example.Database.Interfaces.IUserDatabase;
 
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Map;
 
 public class LoginAuthentification implements ILoginAuthentification {
@@ -17,7 +18,7 @@ public class LoginAuthentification implements ILoginAuthentification {
         this.userDatabase = userDatabase;
     }
 
-    public void handleLogin(String username, String password, PrintWriter printWriter) {
+    public void handleLogin(String username, String password, PrintWriter printWriter, Socket clientSocket) {
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             printWriter.println("Error: Username and password cannot be empty");
             return;
@@ -26,16 +27,11 @@ public class LoginAuthentification implements ILoginAuthentification {
         boolean success = userDatabase.authenticateUser(username, password);
         if (success) {
             int id = userDatabase.getUserIdByUsername(username);
-            User user = userDatabase.getUserById(id);
+            User user = new User(username, id, clientSocket);
 
-            if (user != null) {
-                userMap.put(id, user);
-                printWriter.println("Login successful");
-                org.example.Util.SimpleLogger.log("User logged in: " + username);
-            } else {
-                printWriter.println("Error: User not found after authentication");
-                org.example.Util.SimpleLogger.log("Authenticated user not found in database: " + username);
-            }
+            userMap.put(id, user);
+            printWriter.println("Login successful");
+            org.example.Util.SimpleLogger.log("User logged in: " + username);
         } else {
             printWriter.println("Error: Invalid username or password");
             org.example.Util.SimpleLogger.log("Failed login attempt for user: " + username);
@@ -71,8 +67,14 @@ public class LoginAuthentification implements ILoginAuthentification {
             return;
         }
 
-        userMap.values().removeIf(user -> user.getUsername().equals(username));
-        printWriter.println("Logout successful");
-        org.example.Util.SimpleLogger.log("User logged out: " + username);
+        boolean removed = userMap.entrySet().removeIf(entry ->
+                entry.getValue().getUsername().equals(username));
+
+        if (removed) {
+            printWriter.println("Logout successful");
+            org.example.Util.SimpleLogger.log("User logged out: " + username);
+        } else {
+            printWriter.println("Error: User not found");
+        }
     }
 }

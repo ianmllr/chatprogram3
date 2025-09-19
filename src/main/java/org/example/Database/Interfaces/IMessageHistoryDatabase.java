@@ -2,7 +2,7 @@ package org.example.Database.Interfaces;
 
 import org.example.Database.Repos.MessageHistoryDatabase;
 
-import java.Util.List;
+import java.util.List;
 
 public interface IMessageHistoryDatabase {
     boolean saveMessage(String senderId, String messageType, String payload);

@@ -7,12 +7,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class SimpleLogger {
-    static org.example.Util.ConfigLoader config = new org.example.Util.ConfigLoader("config.properties");
-    private static final String LOG_FILE = config.getString("LOG_NAME"); // filen oprettes hvis den ikke findes
+    private final String logFile;
 
-    public static synchronized void log(String message) {
+    public SimpleLogger(ConfigLoader config) {
+        this.logFile = config.getString("LOG_NAME");
+    }
+
+    public synchronized void log(String message) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        try (FileWriter fw = new FileWriter(LOG_FILE, true);
+        try (FileWriter fw = new FileWriter(logFile, true);
              PrintWriter pw = new PrintWriter(fw)) {
             pw.println("[" + timestamp + "] " + message);
         } catch (IOException e) {

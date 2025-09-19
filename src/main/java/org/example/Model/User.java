@@ -13,6 +13,12 @@ public class User {
         this.socket = socket;
     }
 
+    public User(int clientId, String username) {
+        this.clientId = clientId;
+        this.username = username;
+        this.socket = null;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -25,4 +31,7 @@ public class User {
         return socket;
     }
 
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
 }
