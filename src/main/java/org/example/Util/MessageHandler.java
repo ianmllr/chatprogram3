@@ -1,15 +1,21 @@
 package org.example.Util;
 
 import org.example.Model.User;
-import org.example.Database.Interfaces.IUserDatabase;
 import org.example.User.ILoginAuthentification;
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Map;
 
 public class MessageHandler {
     private Map<Integer, User> userMap;
     private ILoginAuthentification loginAuth;
-    private IUserDatabase userDatabase;
+    private Socket clientSocket;
+
+    public MessageHandler(Map<Integer, User> userMap, ILoginAuthentification loginAuth, Socket clientSocket) {
+        this.userMap = userMap;
+        this.loginAuth = loginAuth;
+        this.clientSocket = clientSocket;
+    }
 
     public MessageHandler(Map<Integer, User> userMap) {
         this.userMap = userMap;
@@ -24,7 +30,7 @@ public class MessageHandler {
                 case "REGISTER":
                     String[] reg = message.getPayload().split("\\|");
                     if (reg.length == 2) {
-                        loginAuth.handleRegister(reg[0], reg[1], out);
+                        loginAuth.handleRegister(reg[0], reg[1], out, clientSocket);
                     } else {
                         out.println("Error: Invalid register format");
                     }
@@ -52,7 +58,7 @@ public class MessageHandler {
         if (credentials.length == 2) {
             String username = credentials[0];
             String password = credentials[1];
-            loginAuth.handleLogin(username, password, printWriter);
+            loginAuth.handleLogin(username, password, printWriter, clientSocket);
         } else {
             printWriter.println("Error: Invalid login payload");
         }

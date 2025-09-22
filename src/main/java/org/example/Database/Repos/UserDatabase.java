@@ -8,9 +8,9 @@ import java.sql.*;
 
 public class UserDatabase implements IUserDatabase {
 
-    private final org.example.Database.Repos.IDatabaseConfig dbConfig;
+    private final IDatabaseConfig dbConfig;
 
-    public UserDatabase(org.example.Database.Repos.IDatabaseConfig dbConfig) {
+    public UserDatabase(IDatabaseConfig dbConfig) {
         this.dbConfig = dbConfig;
     }
 
@@ -117,10 +117,4 @@ public class UserDatabase implements IUserDatabase {
             return -1;
         }
     }
-
-
-
-
-
-
 }

@@ -1,5 +1,6 @@
 package org.example.Database.Repos;
 
+import org.example.Database.Repos.IDatabaseConfig;
 import org.example.Database.Interfaces.IMessageHistoryDatabase;
 import java.sql.*;
 import java.util.ArrayList;
@@ -7,9 +8,9 @@ import java.util.List;
 
 public class MessageHistoryDatabase implements IMessageHistoryDatabase {
 
-    private final org.example.Database.Repos.IDatabaseConfig dbConfig;
+    private final IDatabaseConfig dbConfig;
 
-    public MessageHistoryDatabase(org.example.Database.Repos.IDatabaseConfig dbConfig) {
+    public MessageHistoryDatabase(IDatabaseConfig dbConfig) {
         this.dbConfig = dbConfig;
     }
 
@@ -34,7 +35,7 @@ public class MessageHistoryDatabase implements IMessageHistoryDatabase {
 
     @Override
     public boolean saveMessage(String senderId, String messageType, String payload) {
-        String sql = "INSERT INTO message_history (sender_id, message_type, payload, timestamp) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO message_history (sender_id, message_type, payload) VALUES (?, ?, ?)";
         try (Connection conn = dbConfig.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 

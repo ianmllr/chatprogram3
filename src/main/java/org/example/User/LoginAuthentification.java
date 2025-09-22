@@ -2,6 +2,7 @@ package org.example.User;
 
 import org.example.Model.User;
 import org.example.Database.Interfaces.IUserDatabase;
+import org.example.Util.SimpleLogger;
 
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -11,7 +12,6 @@ public class LoginAuthentification implements ILoginAuthentification {
 
     private final Map<Integer, User> userMap;
     private final IUserDatabase userDatabase;
-
 
     public LoginAuthentification(Map<Integer, User> userMap, IUserDatabase userDatabase) {
         this.userMap = userMap;
@@ -31,15 +31,14 @@ public class LoginAuthentification implements ILoginAuthentification {
 
             userMap.put(id, user);
             printWriter.println("Login successful");
-            org.example.Util.SimpleLogger.log("User logged in: " + username);
+            SimpleLogger.getInstance().log("User logged in: " + username);
         } else {
             printWriter.println("Error: Invalid username or password");
-            org.example.Util.SimpleLogger.log("Failed login attempt for user: " + username);
+            SimpleLogger.getInstance().log("Failed login attempt for user: " + username);
         }
     }
 
-    public void handleRegister(String username, String password, PrintWriter printWriter) {
-
+    public void handleRegister(String username, String password, PrintWriter printWriter, Socket socket) {
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             printWriter.println("Error: Username and password cannot be empty");
             return;
@@ -53,13 +52,12 @@ public class LoginAuthentification implements ILoginAuthentification {
         boolean success = userDatabase.createUser(username, password);
         if (success) {
             printWriter.println("Registration successful");
-            org.example.Util.SimpleLogger.log("New user registered: " + username);
+            SimpleLogger.getInstance().log("New user registered: " + username);
         } else {
             printWriter.println("Error: Registration failed");
-            org.example.Util.SimpleLogger.log("Failed registration attempt for user: " + username);
+            SimpleLogger.getInstance().log("Failed registration attempt for user: " + username);
         }
     }
-
 
     public void handleLogout(String username, PrintWriter printWriter) {
         if (username == null || username.isEmpty()) {
@@ -72,7 +70,7 @@ public class LoginAuthentification implements ILoginAuthentification {
 
         if (removed) {
             printWriter.println("Logout successful");
-            org.example.Util.SimpleLogger.log("User logged out: " + username);
+            SimpleLogger.getInstance().log("User logged out: " + username);
         } else {
             printWriter.println("Error: User not found");
         }
