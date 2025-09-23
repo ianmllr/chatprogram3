@@ -18,6 +18,12 @@ public class LoginAuthentification implements ILoginAuthentification {
         this.userDatabase = userDatabase;
     }
 
+    @Override
+    public boolean authenticateUser(String username, String password) {
+        return userDatabase.authenticateUser(username, password);
+    }
+
+    @Override
     public void handleLogin(String username, String password, PrintWriter printWriter, Socket clientSocket) {
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             printWriter.println("Error: Username and password cannot be empty");
@@ -38,6 +44,7 @@ public class LoginAuthentification implements ILoginAuthentification {
         }
     }
 
+    @Override
     public void handleRegister(String username, String password, PrintWriter printWriter, Socket socket) {
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             printWriter.println("Error: Username and password cannot be empty");
@@ -59,9 +66,12 @@ public class LoginAuthentification implements ILoginAuthentification {
         }
     }
 
+    @Override
     public void handleLogout(String username, PrintWriter printWriter) {
         if (username == null || username.isEmpty()) {
-            printWriter.println("Error: Username cannot be empty");
+            if (printWriter != null) {
+                printWriter.println("Error: Username cannot be empty");
+            }
             return;
         }
 
@@ -69,10 +79,14 @@ public class LoginAuthentification implements ILoginAuthentification {
                 entry.getValue().getUsername().equals(username));
 
         if (removed) {
-            printWriter.println("Logout successful");
+            if (printWriter != null) {
+                printWriter.println("Logout successful");
+            }
             SimpleLogger.getInstance().log("User logged out: " + username);
         } else {
-            printWriter.println("Error: User not found");
+            if (printWriter != null) {
+                printWriter.println("Error: User not found");
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.example.Server;
 
+import org.example.Database.Repos.DatabaseConfig;
 import org.example.Model.User;
 import org.example.Util.ConfigLoader;
 import org.example.User.LoginAuthentification;
@@ -7,7 +8,6 @@ import org.example.Util.ClientHandler;
 import org.example.Util.MessageHandler;
 import org.example.Database.Interfaces.IUserDatabase;
 import org.example.Database.Repos.UserDatabase;
-import org.example.Database.DatabaseConfig;
 
 import java.io.*;
 import java.net.*;
@@ -39,6 +39,7 @@ public class Server {
                 LoginAuthentification loginAuth = new LoginAuthentification(userMap, userDatabase);
                 MessageHandler messageHandler = new MessageHandler(userMap);
                 threadPool.submit(new ClientHandler(socket, messageHandler, loginAuth));
+                System.out.println("New client connected: " + socket.getInetAddress());
             }
         } catch (IOException ex) {
             ex.printStackTrace();

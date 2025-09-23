@@ -2,7 +2,9 @@ package org.example.Util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 
 public class MessageParser {
 
@@ -19,7 +21,6 @@ public class MessageParser {
             this.payload = payload;
         }
 
-        // Getters
         public String getClientId() {
             return clientId;
         }
@@ -41,26 +42,24 @@ public class MessageParser {
             return "ParsedMessage{ClientId='" + clientId + "', Timestamp=" + timestamp +
                     ", MessageType='" + messageType + "', Payload='" + payload + "'}";
         }
-    }
 
+    }
 
     public static ParsedMessage parseMessage(String messageLine) {
         if (messageLine == null || messageLine.isEmpty()) {
             throw new IllegalArgumentException("Beskedlinjen er tom!");
         }
 
-        // Splitter beskeden baseret på separator "|"
-        String[] parts = messageLine.split("\\|");
+        String[] parts = messageLine.split("\\|", 4);
         if (parts.length < 4) {
             throw new IllegalArgumentException("Beskedlinjen er ugyldig eller mangler felter: " + messageLine);
         }
 
-        String clientId = parts[0]; // Client ID
-        String timestampStr = parts[1]; // Tidsstempel
-        String messageType = parts[2]; // Beskedtype (TEXT, LOGIN, FILE_TRANSFER, etc.)
-        String payload = parts[3]; // Indhold (kan være tekst, filnavn, emoji osv.)
+        String clientId = parts[0];
+        String timestampStr = parts[1];
+        String messageType = parts[2];
+        String payload = parts[3];
 
-        // Parser tidsstempel
         Date timestamp;
         try {
             timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(timestampStr);
@@ -68,7 +67,6 @@ public class MessageParser {
             throw new IllegalArgumentException("Ugyldigt tidsstempelformat: " + timestampStr);
         }
 
-        // Returnerer objektet med parsed data
         return new ParsedMessage(clientId, timestamp, messageType, payload);
     }
 }

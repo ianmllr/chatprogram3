@@ -1,4 +1,4 @@
-package org.example.Database;
+package org.example.Database.Repos;
 
 import org.example.Util.ConfigLoader;
 
