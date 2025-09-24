@@ -1,6 +1,6 @@
 package org.example.Util;
 
-import org.example.User.LoginAuthentification;
+import org.example.Service.AuthenticationService;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -10,13 +10,13 @@ import java.net.Socket;
 public class ClientHandler implements Runnable {
     private final Socket clientSocket;
     private final MessageHandler messageHandler;
-    private final LoginAuthentification loginAuth;
+    private final AuthenticationService authenticationService;
     private String loggedInUsername = null;
 
-    public ClientHandler(Socket clientSocket, MessageHandler messageHandler, LoginAuthentification loginAuth) {
+    public ClientHandler(Socket clientSocket, MessageHandler messageHandler, AuthenticationService authenticationService) {
         this.clientSocket = clientSocket;
         this.messageHandler = messageHandler;
-        this.loginAuth = loginAuth;
+        this.authenticationService = authenticationService;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ClientHandler implements Runnable {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
 
             messageHandler.setClientSocket(clientSocket);
-            messageHandler.setLoginAuth(loginAuth);
+            messageHandler.setLoginAuth(authenticationService);
             messageHandler.setClientHandler(this);
 
             out.println("Welcome to the chat server!");
@@ -41,7 +41,7 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         } finally {
             if (loggedInUsername != null) {
-                loginAuth.handleLogout(loggedInUsername, null);
+                authenticationService.handleLogout(loggedInUsername, null);
             }
             try {
                 clientSocket.close();

@@ -1,23 +1,25 @@
 package org.example.Client;
 
 import org.example.Util.ConfigLoader;
+import org.example.Util.ProtocolHandler;
 
 import java.io.*;
 import java.net.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
 import java.util.Scanner;
+import java.util.UUID;
 
 public class Client {
     static ConfigLoader config = new ConfigLoader("config.properties");
     private static final String SERVER_HOST = config.getString("SERVER_HOST");
     private static final int SERVER_PORT = config.getInt("PORT");
+    String clientId;
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-    private String clientId;
     private boolean connected = false;
     private boolean loggedIn = false;
+    private ProtocolHandler protocolHandler;
 
     public static void main(String[] args) {
         new Client().start();
@@ -29,9 +31,9 @@ public class Client {
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             connected = true;
+            clientId = UUID.randomUUID().toString();
 
-            clientId = "client" + System.currentTimeMillis();
-
+            protocolHandler = new ProtocolHandler(out);
             Thread messageReader = new Thread(this::readMessages);
             messageReader.start();
 
@@ -53,10 +55,7 @@ public class Client {
                 }
                 System.out.println(message);
             }
-        } catch (IOException e) {
-            if (connected) {
-                System.err.println("Connection lost: " + e.getMessage());
-            }
+        } catch (IOException _) {
         }
     }
 
@@ -71,7 +70,7 @@ public class Client {
 
             if (input.startsWith("/quit") || input.equals("quit")) {
                 if (loggedIn) {
-                    sendLogout();
+                    protocolHandler.sendLogout(clientId);
                 }
                 disconnect();
                 break;
@@ -93,14 +92,14 @@ public class Client {
         switch (command) {
             case "login":
                 if (parts.length == 3) {
-                    sendLogin(parts[1], parts[2]);
+                    protocolHandler.sendLogin(clientId, parts[1], parts[2]);
                 } else {
                     System.out.println("Usage: login <username> <password>");
                 }
                 break;
             case "register":
                 if (parts.length == 3) {
-                    sendRegister(parts[1], parts[2]);
+                    protocolHandler.sendRegister(clientId, parts[1], parts[2]);
                 } else {
                     System.out.println("Usage: register <username> <password>");
                 }
@@ -116,7 +115,7 @@ public class Client {
         if (input.startsWith("/")) {
             handleSlashCommand(input);
         } else {
-            sendTextMessage(input);
+            protocolHandler.sendTextMessage(clientId, input);
         }
     }
 
@@ -127,25 +126,25 @@ public class Client {
         switch (command) {
             case "/join":
                 if (parts.length == 2) {
-                    sendJoinRoom(parts[1]);
+                    protocolHandler.sendJoinRoom(clientId, parts[1]);
                 } else {
                     System.out.println("Usage: /join <room_name>");
                 }
                 break;
             case "/leave":
-                sendLeaveRoom();
+                protocolHandler.sendLeaveRoom(clientId);
                 break;
             case "/list_users":
-                sendListUsers();
+                protocolHandler.sendListUsers(clientId);
                 break;
             case "/list_rooms":
-                sendListRooms();
+                protocolHandler.sendListRooms(clientId);
                 break;
             case "/help":
                 showHelp();
                 break;
             default:
-                sendTextMessage(input);
+                protocolHandler.sendTextMessage(clientId, input);
                 break;
         }
     }
@@ -161,51 +160,6 @@ public class Client {
         System.out.println("Or just type a message to send to your current room");
     }
 
-    private void sendLogin(String username, String password) {
-        String message = formatMessage("LOGIN", username + "|" + password);
-        out.println(message);
-    }
-
-    private void sendRegister(String username, String password) {
-        String message = formatMessage("REGISTER", username + "|" + password);
-        out.println(message);
-    }
-
-    private void sendLogout() {
-        String message = formatMessage("LOGOUT", "logout");
-        out.println(message);
-    }
-
-    private void sendTextMessage(String text) {
-        String message = formatMessage("TEXT", text);
-        out.println(message);
-    }
-
-    private void sendJoinRoom(String roomName) {
-        String message = formatMessage("JOIN_ROOM", roomName);
-        out.println(message);
-    }
-
-    private void sendLeaveRoom() {
-        String message = formatMessage("LEAVE_ROOM", "");
-        out.println(message);
-    }
-
-    private void sendListUsers() {
-        String message = formatMessage("LIST_USERS", "");
-        out.println(message);
-    }
-
-    private void sendListRooms() {
-        String message = formatMessage("LIST_ROOMS", "");
-        out.println(message);
-    }
-
-    private String formatMessage(String messageType, String payload) {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        return clientId + "|" + timestamp + "|" + messageType + "|" + payload;
-    }
-
     private void disconnect() {
         connected = false;
         try {
@@ -217,4 +171,8 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+
+
+
 }
