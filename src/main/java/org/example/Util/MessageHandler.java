@@ -2,10 +2,9 @@ package org.example.Util;
 
 import org.example.Database.Interfaces.IUserDatabase;
 import org.example.Model.User;
-import org.example.User.ILoginAuthentification;
+import org.example.User.ILoginAuthentication;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +12,7 @@ import java.util.Set;
 
 public class MessageHandler {
     private Map<Integer, User> userMap;
-    private ILoginAuthentification loginAuth;
+    private ILoginAuthentication loginAuth;
     private IUserDatabase userDatabase;
     private Socket clientSocket;
     private ClientHandler clientHandler;
@@ -30,7 +29,7 @@ public class MessageHandler {
         this.userMap = userMap;
     }
 
-    public void setLoginAuth(ILoginAuthentification loginAuth) {
+    public void setLoginAuth(ILoginAuthentication loginAuth) {
         this.loginAuth = loginAuth;
     }
 

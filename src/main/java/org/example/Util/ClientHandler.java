@@ -1,6 +1,6 @@
 package org.example.Util;
 
-import org.example.User.LoginAuthentification;
+import org.example.User.LoginAuthentication;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -10,10 +10,10 @@ import java.net.Socket;
 public class ClientHandler implements Runnable {
     private final Socket clientSocket;
     private final MessageHandler messageHandler;
-    private final LoginAuthentification loginAuth;
+    private final LoginAuthentication loginAuth;
     private String loggedInUsername = null;
 
-    public ClientHandler(Socket clientSocket, MessageHandler messageHandler, LoginAuthentification loginAuth) {
+    public ClientHandler(Socket clientSocket, MessageHandler messageHandler, LoginAuthentication loginAuth) {
         this.clientSocket = clientSocket;
         this.messageHandler = messageHandler;
         this.loginAuth = loginAuth;

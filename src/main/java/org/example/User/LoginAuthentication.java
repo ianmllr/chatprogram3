@@ -2,18 +2,20 @@ package org.example.User;
 
 import org.example.Model.User;
 import org.example.Database.Interfaces.IUserDatabase;
+import org.example.Service.AuthenticationService;
 import org.example.Util.SimpleLogger;
 
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Map;
 
-public class LoginAuthentification implements ILoginAuthentification {
+public class LoginAuthentication implements ILoginAuthentication {
 
     private final Map<Integer, User> userMap;
     private final IUserDatabase userDatabase;
+    private final AuthenticationService authenticationService = new AuthenticationService();
 
-    public LoginAuthentification(Map<Integer, User> userMap, IUserDatabase userDatabase) {
+    public LoginAuthentication(Map<Integer, User> userMap, IUserDatabase userDatabase) {
         this.userMap = userMap;
         this.userDatabase = userDatabase;
     }
@@ -27,20 +29,15 @@ public class LoginAuthentification implements ILoginAuthentification {
     public void handleLogin(String username, String password, PrintWriter printWriter, Socket clientSocket) {
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             printWriter.println("Error: Username and password cannot be empty");
-            return;
-        }
-
-        boolean success = userDatabase.authenticateUser(username, password);
-        if (success) {
-            int id = userDatabase.getUserIdByUsername(username);
-            User user = new User(username, id, clientSocket);
-
-            userMap.put(id, user);
-            printWriter.println("Login successful");
-            SimpleLogger.getInstance().log("User logged in: " + username);
         } else {
-            printWriter.println("Error: Invalid username or password");
-            SimpleLogger.getInstance().log("Failed login attempt for user: " + username);
+            if (authenticationService.authenticateUser(username, password, printWriter, clientSocket)) {
+                printWriter.println("Login successful");
+                SimpleLogger.getInstance().log("User logged in: " + username);
+            } else {
+                printWriter.println("Error: Invalid username or password");
+                SimpleLogger.getInstance().log("Failed login attempt for user: " + username);
+
+            }
         }
     }
 
