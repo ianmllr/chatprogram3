@@ -142,6 +142,8 @@ public class MessageHandler {
         }
 
         String payload = message.getPayload();
+        String originalText = message.getPayload();
+        String processedText = convertToEmoji(originalText);
 
         if (payload.startsWith("/")) {
             handleCommand(payload, out);
@@ -149,6 +151,7 @@ public class MessageHandler {
         }
 
         broadcastToRoom(currentRoom, username, payload);
+
     }
 
     private void handleCommand(String command, PrintWriter out) {
@@ -323,5 +326,13 @@ public class MessageHandler {
     private void handlePrivateMessage(String sender, String recipient, String message) {
         String formattedMessage = "[PM] " + sender + ": " + message;
         sendMessageToUser(recipient, formattedMessage);
+    }
+
+    private String convertToEmoji(String payload) {
+        payload = payload.replace(":smile", new String(Character.toChars(0x1F604))); // 😄
+        payload = payload.replace(":sad:", new String(Character.toChars(0x1F641))); // 🙁
+        payload = payload.replace(":naughty:", new String(Character.toChars(0x1F608	))); // 😈
+        payload = payload.replace(":skull:", new String(Character.toChars(0x1F480))); // 💀
+        return payload;
     }
 }
