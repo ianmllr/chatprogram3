@@ -1,19 +1,15 @@
 package org.example.Util;
 
-import org.example.Database.Interfaces.IUserDatabase;
 import org.example.Model.User;
 import org.example.Server.Server;
 import org.example.Service.AuthenticationService;
 import org.example.Service.ChatService;
 import org.example.Service.MessageService;
-import org.example.User.ILoginAuthentication;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.Timestamp;
 
 public class MessageHandler {
-    private ILoginAuthentication loginAuth;
-    private IUserDatabase userDatabase;
     private Socket clientSocket;
     private ClientHandler clientHandler;
     private AuthenticationService authenticationService;
