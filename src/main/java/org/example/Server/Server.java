@@ -38,7 +38,7 @@ public class Server {
             while (true) {
                 Socket socket = serverSocket.accept();
                 LoginAuthentication loginAuth = new LoginAuthentication(userMap, userDatabase);
-                MessageHandler messageHandler = new MessageHandler(userMap);
+                MessageHandler messageHandler = new MessageHandler(socket);
                 threadPool.submit(new ClientHandler(socket, messageHandler, loginAuth));
                 System.out.println("New client connected: " + socket.getInetAddress());
             }

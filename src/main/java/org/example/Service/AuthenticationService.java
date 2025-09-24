@@ -14,8 +14,7 @@ public class AuthenticationService {
     private final UserDatabase userDatabase = new UserDatabase(new DatabaseConfig());
 
     public boolean authenticateUser(String username, String password, PrintWriter printWriter, Socket clientSocket) {
-        boolean success = userDatabase.authenticateUser(username, password);
-        if (success) {
+        if (userDatabase.authenticateUser(username, password)) {
             int id = userDatabase.getUserIdByUsername(username);
             User user = new User(username, id, clientSocket);
             Server.userMap.put(id, user);
@@ -24,4 +23,6 @@ public class AuthenticationService {
             return false;
         }
     }
+
+
 }
