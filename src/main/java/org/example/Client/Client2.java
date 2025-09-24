@@ -1,12 +1,15 @@
 package org.example.Client;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
-public class Client {
+public class Client2 {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 8080;
     private Socket socket;
@@ -17,7 +20,7 @@ public class Client {
     private boolean loggedIn = false;
 
     public static void main(String[] args) {
-        new Client().start();
+        new Client2().start();
     }
 
     public void start() {

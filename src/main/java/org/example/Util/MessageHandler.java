@@ -5,6 +5,7 @@ import org.example.Model.User;
 import org.example.User.ILoginAuthentification;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -114,7 +115,7 @@ public class MessageHandler {
             clientHandler.setLoggedInUsername(username);
 
             out.println("Login successful! Welcome " + username);
-            out.println("Available commands: /join <room>, /leave, /list_users, /list_rooms, /help, /quit");
+            out.println("Available commands: /join <room>, /leave, /list_users, /list_rooms, /create_room, /send_dm, /help, /quit");
             SimpleLogger.getInstance().log("User successfully logged in: " + username);
             joinDefaultRoom(username, out);
         } else {
@@ -172,8 +173,9 @@ public class MessageHandler {
             return;
         }
 
-        String processedText = convertToEmoji(payload);
-        broadcastToRoom(currentRoom, username, processedText);
+        String timestamp = message.getTimestamp().toString();
+
+        broadcastToRoom(currentRoom, username, timestamp, payload);
         SimpleLogger.getInstance().log("Message from " + username + " in room " + currentRoom + ": " + payload);
 
     }
@@ -198,6 +200,21 @@ public class MessageHandler {
                     createRoom(parts[1], out);
                 } else {
                     out.println("Usage: /create_room <room_name>");
+                }
+                break;
+            case "/send_dm":
+                if (parts.length == 2) {
+                    String[] dmParts = parts[1].split(" ", 2);
+                    if (dmParts.length == 2) {
+                        String recipient = dmParts[0];
+                        String dmMessage = dmParts[1];
+                        handlePrivateMessage(username, recipient, dmMessage);
+                        SimpleLogger.getInstance().log("Private message from " + username + " to " + recipient + ": " + dmMessage);
+                    } else {
+                        out.println("Usage: /send_dm <username> <message>");
+                    }
+                } else {
+                    out.println("Usage: /send_dm <username> <message>");
                 }
                 break;
             case "/leave":
@@ -274,6 +291,7 @@ public class MessageHandler {
 
     private void joinRoom(String username, String roomName, PrintWriter out) {
         leaveCurrentRoom(username);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         chatRooms.computeIfAbsent(roomName, k -> ConcurrentHashMap.newKeySet()).add(username);
         userCurrentRoom.put(username, roomName);
@@ -281,10 +299,11 @@ public class MessageHandler {
         SimpleLogger.getInstance().log("User " + username + " joined room: " + roomName);
 
         out.println("Joined room: " + roomName);
-        broadcastToRoom(roomName, "SERVER", username + " joined the room");
+        broadcastToRoom(roomName, "SERVER", timestamp.toString(),username + " joined the room");
     }
 
     private void leaveCurrentRoom(String username) {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String currentRoom = userCurrentRoom.remove(username);
         if (currentRoom != null) {
             Set<String> usersInRoom = chatRooms.get(currentRoom);
@@ -295,17 +314,17 @@ public class MessageHandler {
                     SimpleLogger.getInstance().log("User " + username + " left room: " + currentRoom);
 
                 } else {
-                    broadcastToRoom(currentRoom, "SERVER", username + " left the room");
+                    broadcastToRoom(currentRoom, "SERVER", timestamp.toString(),username + " left the room");
                 }
             }
         }
     }
 
-    private void broadcastToRoom(String roomName, String senderUsername, String messageText) {
+    private void broadcastToRoom(String roomName, String senderUsername, String timestamp, String messageText) {
         Set<String> usersInRoom = chatRooms.get(roomName);
         if (usersInRoom == null) return;
 
-        String formattedMessage = "[" + roomName + "] " + senderUsername + ": " + messageText;
+        String formattedMessage = "[" + roomName + "] " + "[" + timestamp + "]: " + senderUsername + ": " + messageText;
 
         for (String username : usersInRoom) {
             if (!username.equals(senderUsername)) {

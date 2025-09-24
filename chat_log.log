@@ -11,3 +11,36 @@
 [2025-09-24 10:42:52] Unauthenticated user tried to send message at 2025-09-24 10:42:52.369
 [2025-09-24 10:42:54] Unauthenticated user tried to send message at 2025-09-24 10:42:54.479
 [2025-09-24 10:42:57] Unauthenticated user tried to send message at 2025-09-24 10:42:57.135
+[2025-09-24 10:43:03] Unauthenticated user tried to send message at 2025-09-24 10:43:03.456
+[2025-09-24 10:43:33] Login attempt for user: ian
+[2025-09-24 10:43:33] User successfully logged in: ian
+[2025-09-24 10:43:33] User ian joined room: general
+[2025-09-24 10:43:33] User: ian sent message: [general] SERVER: ian joined the room
+[2025-09-24 10:43:55] Command from ian: /create_room
+[2025-09-24 10:44:05] Command from ian: /create_room hej
+[2025-09-24 10:44:05] Room named: hej created at 2025-09-24 10:44:05.065 by user: ian
+[2025-09-24 10:44:08] User ian left room: general
+[2025-09-24 10:44:08] User ian joined room: hej
+[2025-09-24 10:44:08] User: ian sent message: [hej] SERVER: ian joined the room
+[2025-09-24 10:44:10] Message from ian in room hej: hej
+[2025-09-24 10:44:12] Message from ian in room hej: 🙁
+[2025-09-24 10:44:16] Message from ian in room hej: :sad
+[2025-09-24 10:44:30] Message from ian in room hej: :smile
+[2025-09-24 10:44:34] Message from ian in room hej: 0x1F604
+[2025-09-24 10:44:35] Message from ian in room hej: 0x1F604
+[2025-09-24 10:45:09] Message from ian in room hej: 🙁
+[2025-09-24 11:03:00] Login attempt for user: ian
+[2025-09-24 11:03:00] User successfully logged in: ian
+[2025-09-24 11:03:00] User ian joined room: general
+[2025-09-24 11:03:00] User: ian sent message: [general] [2025-09-24 11:03:00.626]: SERVER: ian joined the room
+[2025-09-24 11:03:41] New user registered: kamby
+[2025-09-24 11:03:46] Login attempt for user: kamby
+[2025-09-24 11:03:46] User successfully logged in: kamby
+[2025-09-24 11:03:46] User kamby joined room: general
+[2025-09-24 11:03:46] User: ian sent message: [general] [2025-09-24 11:03:46.409]: SERVER: kamby joined the room
+[2025-09-24 11:03:46] User: kamby sent message: [general] [2025-09-24 11:03:46.409]: SERVER: kamby joined the room
+[2025-09-24 11:03:49] User: ian sent message: [general] [Wed Sep 24 11:03:49 CEST 2025]: kamby: hje
+[2025-09-24 11:03:49] Message from kamby in room general: hje
+[2025-09-24 11:04:27] Command from ian: /send_dm
+[2025-09-24 11:04:34] Command from ian: /send_dm kamby whatup
+[2025-09-24 11:04:34] Private message from ian to kamby: whatup
