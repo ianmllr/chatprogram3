@@ -19,11 +19,11 @@ public class MessageHandler {
     private static final Map<String, Set<String>> chatRooms = new ConcurrentHashMap<>();
     private static final Map<String, String> userCurrentRoom = new ConcurrentHashMap<>();
 
-    public MessageHandler(Map<Integer, User> userMap, ILoginAuthentification loginAuth, Socket clientSocket) {
-        this.userMap = userMap;
-        this.loginAuth = loginAuth;
-        this.clientSocket = clientSocket;
-    }
+//    public MessageHandler(Map<Integer, User> userMap, ILoginAuthentification loginAuth, Socket clientSocket) {
+//        this.userMap = userMap;
+//        this.loginAuth = loginAuth;
+//        this.clientSocket = clientSocket;
+//    }
 
     public MessageHandler(Map<Integer, User> userMap) {
         this.userMap = userMap;
@@ -78,33 +78,48 @@ public class MessageHandler {
                     handleUnknown(message, out);
             }
         } catch (Exception e) {
+            SimpleLogger.getInstance().log("Error handling message: " + e.getMessage());
             out.println("Server error: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private void handleLogin(MessageParser.ParsedMessage message, PrintWriter out) {
-        if (clientHandler.getLoggedInUsername() != null) {
-            out.println("Error: Already logged in as " + clientHandler.getLoggedInUsername());
+        String currentUsername = clientHandler.getLoggedInUsername();
+        if (currentUsername != null) {
+            out.println("Error: Already logged in as " + currentUsername);
+            SimpleLogger.getInstance().log("User " + currentUsername + " attempted second login");
             return;
         }
 
         String[] credentials = message.getPayload().split("\\|");
-        if (credentials.length == 2) {
-            String username = credentials[0];
-            String password = credentials[1];
+        if (credentials.length != 2) {
+            out.println("Error: Invalid login format");
+            SimpleLogger.getInstance().log("Invalid login payload received: " + message.getPayload());
+            return;
+        }
 
-            if (loginAuth.authenticateUser(username, password)) {
-                clientHandler.setLoggedInUsername(username);
-                out.println("Login successful! Welcome " + username);
-                out.println("Available commands: /join <room>, /leave, /list_users, /list_rooms, /quit");
+        String username = credentials[0].trim();
+        String password = credentials[1];
 
-                joinDefaultRoom(username, out);
-            } else {
-                out.println("Error: Invalid username or password");
-            }
+        if (username.isEmpty() || password.isEmpty()) {
+            out.println("Error: Username and password cannot be empty");
+            SimpleLogger.getInstance().log("Login attempt with empty credentials");
+            return;
+        }
+
+        SimpleLogger.getInstance().log("Login attempt for user: " + username);
+
+        if (loginAuth.authenticateUser(username, password)) {
+            clientHandler.setLoggedInUsername(username);
+
+            out.println("Login successful! Welcome " + username);
+            out.println("Available commands: /join <room>, /leave, /list_users, /list_rooms, /help, /quit");
+            SimpleLogger.getInstance().log("User successfully logged in: " + username);
+            joinDefaultRoom(username, out);
         } else {
-            out.println("Error: Invalid login payload");
+            out.println("Error: Invalid username or password");
+            SimpleLogger.getInstance().log("Failed login attempt for user: " + username);
         }
     }
 
@@ -114,6 +129,7 @@ public class MessageHandler {
             loginAuth.handleRegister(reg[0], reg[1], out, clientSocket);
         } else {
             out.println("Error: Invalid register format");
+            SimpleLogger.getInstance().log("Someone tried to register with invalid format at " + new Timestamp(System.currentTimeMillis()));
         }
     }
 
@@ -123,8 +139,10 @@ public class MessageHandler {
             leaveCurrentRoom(username);
             clientHandler.setLoggedInUsername(null);
             out.println("Logout successful");
+            SimpleLogger.getInstance().log("User logged out: " + username);
         } else {
             out.println("Error: Not logged in");
+            SimpleLogger.getInstance().log("Logout attempt without being logged in at " + new Timestamp(System.currentTimeMillis()));
         }
     }
 
@@ -132,25 +150,31 @@ public class MessageHandler {
         String username = clientHandler.getLoggedInUsername();
         if (username == null) {
             out.println("Error: Please login first");
+            SimpleLogger.getInstance().log("Unauthenticated user tried to send message at " + new Timestamp(System.currentTimeMillis()));
             return;
         }
 
         String currentRoom = userCurrentRoom.get(username);
         if (currentRoom == null) {
             out.println("Error: Please join a room first");
+            SimpleLogger.getInstance().log("User " + username + " tried to send message without joining a room at " + new Timestamp(System.currentTimeMillis()));
             return;
         }
 
         String payload = message.getPayload();
-        String originalText = message.getPayload();
-        String processedText = convertToEmoji(originalText);
+
+        if (checkForEmoji(payload)) {
+            payload = convertToEmoji(payload);
+        }
 
         if (payload.startsWith("/")) {
             handleCommand(payload, out);
             return;
         }
 
-        broadcastToRoom(currentRoom, username, payload);
+        String processedText = convertToEmoji(payload);
+        broadcastToRoom(currentRoom, username, processedText);
+        SimpleLogger.getInstance().log("Message from " + username + " in room " + currentRoom + ": " + payload);
 
     }
 
@@ -158,6 +182,8 @@ public class MessageHandler {
         String username = clientHandler.getLoggedInUsername();
         String[] parts = command.split(" ", 2);
         String cmd = parts[0].toLowerCase();
+
+        SimpleLogger.getInstance().log("Command from " + username + ": " + command);
 
         switch (cmd) {
             case "/join":
@@ -198,6 +224,7 @@ public class MessageHandler {
             out.println("Error: Please login first");
             return;
         }
+
         joinRoom(username, message.getPayload(), out);
     }
 
@@ -251,6 +278,8 @@ public class MessageHandler {
         chatRooms.computeIfAbsent(roomName, k -> ConcurrentHashMap.newKeySet()).add(username);
         userCurrentRoom.put(username, roomName);
 
+        SimpleLogger.getInstance().log("User " + username + " joined room: " + roomName);
+
         out.println("Joined room: " + roomName);
         broadcastToRoom(roomName, "SERVER", username + " joined the room");
     }
@@ -263,6 +292,8 @@ public class MessageHandler {
                 usersInRoom.remove(username);
                 if (usersInRoom.isEmpty()) {
                     chatRooms.remove(currentRoom);
+                    SimpleLogger.getInstance().log("User " + username + " left room: " + currentRoom);
+
                 } else {
                     broadcastToRoom(currentRoom, "SERVER", username + " left the room");
                 }
@@ -279,6 +310,7 @@ public class MessageHandler {
         for (String username : usersInRoom) {
             if (!username.equals(senderUsername)) {
                 sendMessageToUser(username, formattedMessage);
+                SimpleLogger.getInstance().log("User: " + username + " sent message: " + formattedMessage);
             }
         }
     }
@@ -316,6 +348,7 @@ public class MessageHandler {
         chatRooms.putIfAbsent(roomName, ConcurrentHashMap.newKeySet());
         out.println("Room created: " + roomName);
         out.println("Use /join " + roomName + " to join the room");
+        SimpleLogger.getInstance().log("Room named: " + roomName + " created at " + new Timestamp(System.currentTimeMillis()) + " by user: " + clientHandler.getLoggedInUsername());
     }
 
     private void handleUnknown(MessageParser.ParsedMessage message, PrintWriter out) {
@@ -327,6 +360,11 @@ public class MessageHandler {
         String formattedMessage = "[PM] " + sender + ": " + message;
         sendMessageToUser(recipient, formattedMessage);
     }
+
+    private boolean checkForEmoji(String payload) {
+        return payload.contains(":smile:") || payload.contains(":sad:") || payload.contains(":naughty:") || payload.contains(":skull:");
+    }
+
 
     private String convertToEmoji(String payload) {
         payload = payload.replace(":smile", new String(Character.toChars(0x1F604))); // 😄

@@ -43,12 +43,23 @@ public class Client {
         try {
             String message;
             while (connected && (message = in.readLine()) != null) {
-                if (message.contains("Login successful")) {
+                // Check for login success - handle multiple possible formats
+                if (message.contains("Login successful") ||
+                        message.contains("LOGIN SUCCESSFUL") ||
+                        message.contains("Welcome") && loggedIn == false) {
                     loggedIn = true;
-                } else if (message.contains("Logout successful") || message.contains("Goodbye!")) {
-                    loggedIn = false;
+                    System.out.println(message);
                 }
-                System.out.println(message);
+                // Check for logout
+                else if (message.contains("Logout successful") ||
+                        message.contains("Goodbye!")) {
+                    loggedIn = false;
+                    System.out.println(message);
+                }
+                // Regular messages
+                else {
+                    System.out.println(message);
+                }
             }
         } catch (IOException e) {
             if (connected) {
@@ -72,6 +83,12 @@ public class Client {
                 }
                 disconnect();
                 break;
+            }
+
+            // Debug: Let's see what the login state is
+            if (input.equals("debug")) {
+                System.out.println("DEBUG: loggedIn = " + loggedIn);
+                continue;
             }
 
             if (!loggedIn) {
@@ -129,6 +146,13 @@ public class Client {
                     System.out.println("Usage: /join <room_name>");
                 }
                 break;
+            case "/create":
+                if (parts.length == 2) {
+                    sendCreateRoom(parts[1]);
+                } else {
+                    System.out.println("Usage: /create <room_name>");
+                }
+                break;
             case "/leave":
                 sendLeaveRoom();
                 break;
@@ -137,6 +161,18 @@ public class Client {
                 break;
             case "/list_rooms":
                 sendListRooms();
+                break;
+            case "/pm":
+                if (parts.length == 2) {
+                    String[] pmParts = parts[1].split(" ", 2);
+                    if (pmParts.length == 2) {
+                        sendPrivateMessage(pmParts[0], pmParts[1]);
+                    } else {
+                        System.out.println("Usage: /pm <username> <message>");
+                    }
+                } else {
+                    System.out.println("Usage: /pm <username> <message>");
+                }
                 break;
             case "/help":
                 showHelp();
@@ -150,12 +186,15 @@ public class Client {
     private void showHelp() {
         System.out.println("Available commands:");
         System.out.println("/join <room_name> - Join a chat room");
+        System.out.println("/create <room_name> - Create a new room");
         System.out.println("/leave - Leave current room");
         System.out.println("/list_users - List users in current room");
         System.out.println("/list_rooms - List all active rooms");
+        System.out.println("/pm <user> <message> - Send private message");
         System.out.println("/quit - Exit the chat");
         System.out.println("/help - Show this help message");
         System.out.println("Or just type a message to send to your current room");
+        System.out.println("Emojis: :smile: :sad: :naughty: :skull: :heart: :thumbs_up:");
     }
 
     private void sendLogin(String username, String password) {
@@ -183,6 +222,11 @@ public class Client {
         out.println(message);
     }
 
+    private void sendCreateRoom(String roomName) {
+        String message = formatMessage("CREATE_ROOM", roomName);
+        out.println(message);
+    }
+
     private void sendLeaveRoom() {
         String message = formatMessage("LEAVE_ROOM", "");
         out.println(message);
@@ -195,6 +239,11 @@ public class Client {
 
     private void sendListRooms() {
         String message = formatMessage("LIST_ROOMS", "");
+        out.println(message);
+    }
+
+    private void sendPrivateMessage(String recipient, String messageText) {
+        String message = formatMessage("PRIVATE_MESSAGE", recipient + " " + messageText);
         out.println(message);
     }
 
