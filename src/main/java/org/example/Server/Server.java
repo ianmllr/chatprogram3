@@ -2,11 +2,10 @@ package org.example.Server;
 
 import org.example.Database.Repos.DatabaseConfig;
 import org.example.Model.User;
+import org.example.Service.AuthenticationService;
 import org.example.Util.ConfigLoader;
-import org.example.User.LoginAuthentication;
 import org.example.Util.ClientHandler;
 import org.example.Util.MessageHandler;
-import org.example.Database.Interfaces.IUserDatabase;
 import org.example.Database.Repos.UserDatabase;
 
 import java.io.*;
@@ -31,15 +30,15 @@ public class Server {
         ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
         DatabaseConfig dbConfig = new DatabaseConfig();
-        IUserDatabase userDatabase = new UserDatabase(dbConfig);
+        UserDatabase userDatabase = new UserDatabase(dbConfig);
 
         try (ServerSocket serverSocket = new ServerSocket(PORT, 50, InetAddress.getByName(HOST))) {
             System.out.println("Server started on " + HOST + ":" + PORT);
             while (true) {
                 Socket socket = serverSocket.accept();
-                LoginAuthentication loginAuth = new LoginAuthentication(userMap, userDatabase);
+                AuthenticationService authenticationService = new AuthenticationService(userMap, userDatabase);
                 MessageHandler messageHandler = new MessageHandler(socket);
-                threadPool.submit(new ClientHandler(socket, messageHandler, loginAuth));
+                threadPool.submit(new ClientHandler(socket, messageHandler, authenticationService));
                 System.out.println("New client connected: " + socket.getInetAddress());
             }
         } catch (IOException ex) {

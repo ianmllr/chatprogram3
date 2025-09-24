@@ -7,17 +7,19 @@ import java.io.*;
 import java.net.*;
 
 import java.util.Scanner;
+import java.util.UUID;
 
 public class Client {
     static ConfigLoader config = new ConfigLoader("config.properties");
     private static final String SERVER_HOST = config.getString("SERVER_HOST");
     private static final int SERVER_PORT = config.getInt("PORT");
+    String clientId;
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
     private boolean connected = false;
     private boolean loggedIn = false;
-    private final ProtocolHandler protocolHandler = new ProtocolHandler();
+    private ProtocolHandler protocolHandler;
 
     public static void main(String[] args) {
         new Client().start();
@@ -29,7 +31,9 @@ public class Client {
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             connected = true;
+            clientId = UUID.randomUUID().toString();
 
+            protocolHandler = new ProtocolHandler(out);
             Thread messageReader = new Thread(this::readMessages);
             messageReader.start();
 
@@ -66,7 +70,7 @@ public class Client {
 
             if (input.startsWith("/quit") || input.equals("quit")) {
                 if (loggedIn) {
-                    protocolHandler.sendLogout(out);
+                    protocolHandler.sendLogout(clientId);
                 }
                 disconnect();
                 break;
@@ -88,14 +92,14 @@ public class Client {
         switch (command) {
             case "login":
                 if (parts.length == 3) {
-                    protocolHandler.sendLogin(parts[1], parts[2]);
+                    protocolHandler.sendLogin(clientId, parts[1], parts[2]);
                 } else {
                     System.out.println("Usage: login <username> <password>");
                 }
                 break;
             case "register":
                 if (parts.length == 3) {
-                    protocolHandler.sendRegister(parts[1], parts[2]);
+                    protocolHandler.sendRegister(clientId, parts[1], parts[2]);
                 } else {
                     System.out.println("Usage: register <username> <password>");
                 }
@@ -111,7 +115,7 @@ public class Client {
         if (input.startsWith("/")) {
             handleSlashCommand(input);
         } else {
-            protocolHandler.sendTextMessage(input);
+            protocolHandler.sendTextMessage(clientId, input);
         }
     }
 
@@ -122,25 +126,25 @@ public class Client {
         switch (command) {
             case "/join":
                 if (parts.length == 2) {
-                    protocolHandler.sendJoinRoom(parts[1]);
+                    protocolHandler.sendJoinRoom(clientId, parts[1]);
                 } else {
                     System.out.println("Usage: /join <room_name>");
                 }
                 break;
             case "/leave":
-                protocolHandler.sendLeaveRoom();
+                protocolHandler.sendLeaveRoom(clientId);
                 break;
             case "/list_users":
-                protocolHandler.sendListUsers();
+                protocolHandler.sendListUsers(clientId);
                 break;
             case "/list_rooms":
-                protocolHandler.sendListRooms();
+                protocolHandler.sendListRooms(clientId);
                 break;
             case "/help":
                 showHelp();
                 break;
             default:
-                protocolHandler.sendTextMessage(input);
+                protocolHandler.sendTextMessage(clientId, input);
                 break;
         }
     }

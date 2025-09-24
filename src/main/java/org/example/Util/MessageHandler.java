@@ -3,6 +3,7 @@ package org.example.Util;
 import org.example.Database.Interfaces.IUserDatabase;
 import org.example.Model.User;
 import org.example.Server.Server;
+import org.example.Service.AuthenticationService;
 import org.example.Service.ChatService;
 import org.example.Service.MessageService;
 import org.example.User.ILoginAuthentication;
@@ -15,6 +16,7 @@ public class MessageHandler {
     private IUserDatabase userDatabase;
     private Socket clientSocket;
     private ClientHandler clientHandler;
+    private AuthenticationService authenticationService;
     private final ChatService chatService = new ChatService();
     private final MessageService messageService = new MessageService();
 
@@ -23,8 +25,8 @@ public class MessageHandler {
         this.clientSocket = clientSocket;
     }
 
-    public void setLoginAuth(ILoginAuthentication loginAuth) {
-        this.loginAuth = loginAuth;
+    public void setLoginAuth(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     public void setClientSocket(Socket clientSocket) {
@@ -60,7 +62,7 @@ public class MessageHandler {
                     handleCreateRoom(message, out);
                     break;
                 case "LEAVE_ROOM":
-                    handleLeaveRoom(message, out);
+                    handleLeaveRoom(out);
                     break;
                 case "LIST_USERS":
                     handleListRoomUsers(out);
@@ -101,7 +103,7 @@ public class MessageHandler {
 
         SimpleLogger.getInstance().log("Login attempt for user: " + username);
 
-        loginAuth.handleLogin(username, password, out, clientSocket);
+        authenticationService.handleLogin(username, password, out, clientSocket);
 
         boolean loginSuccessful = Server.userMap.values().stream()
                 .anyMatch(user -> user.getUsername().equals(username));
@@ -123,7 +125,7 @@ public class MessageHandler {
     private void handleRegister(MessageParser.ParsedMessage message, PrintWriter out) {
         String[] reg = message.getPayload().split("\\|");
         if (reg.length == 2) {
-            loginAuth.handleRegister(reg[0], reg[1], out, clientSocket);
+            authenticationService.registerUser(reg[0], reg[1], out, clientSocket);
         } else {
             out.println("Error: Invalid register format");
             SimpleLogger.getInstance().log("Someone tried to register with invalid format at " + new Timestamp(System.currentTimeMillis()));
@@ -195,7 +197,7 @@ public class MessageHandler {
         chatService.createRoom(message.getPayload(), out, username);
     }
 
-    private void handleLeaveRoom(MessageParser.ParsedMessage message, PrintWriter out) {
+    private void handleLeaveRoom(PrintWriter out) {
         String username = clientHandler.getLoggedInUsername();
         if (username != null) {
             chatService.leaveCurrentRoom(username);
@@ -272,7 +274,7 @@ public class MessageHandler {
     }
 
     private void handleFileTransfer(MessageParser.ParsedMessage message) {
-
+        /// ikke færdig
     }
 
     private void handleUnknown(MessageParser.ParsedMessage message, PrintWriter out) {
