@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 
 public class Server {
     static ConfigLoader config = new ConfigLoader("config.properties");
+    private static final String HOST = config.getString("SERVER_HOST");
     private static final int PORT = config.getInt("PORT");
     private static final int THREAD_POOL_SIZE = config.getInt("THREAD_POOL_SIZE");
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
@@ -32,8 +33,8 @@ public class Server {
         DatabaseConfig dbConfig = new DatabaseConfig();
         IUserDatabase userDatabase = new UserDatabase(dbConfig);
 
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server started on port " + PORT);
+        try (ServerSocket serverSocket = new ServerSocket(PORT, 50, InetAddress.getByName(HOST))) {
+            System.out.println("Server started on " + HOST + ":" + PORT);
             while (true) {
                 Socket socket = serverSocket.accept();
                 LoginAuthentification loginAuth = new LoginAuthentification(userMap, userDatabase);

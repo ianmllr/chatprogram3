@@ -1,5 +1,7 @@
 package org.example.Client;
 
+import org.example.Util.ConfigLoader;
+
 import java.io.*;
 import java.net.*;
 import java.time.LocalDateTime;
@@ -7,8 +9,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class Client {
-    private static final String SERVER_HOST = "localhost";
-    private static final int SERVER_PORT = 8080;
+    static ConfigLoader config = new ConfigLoader("config.properties");
+    private static final String SERVER_HOST = config.getString("SERVER_HOST");
+    private static final int SERVER_PORT = config.getInt("PORT");
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;

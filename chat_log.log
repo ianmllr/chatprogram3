@@ -44,3 +44,22 @@
 [2025-09-24 11:04:27] Command from ian: /send_dm
 [2025-09-24 11:04:34] Command from ian: /send_dm kamby whatup
 [2025-09-24 11:04:34] Private message from ian to kamby: whatup
+[2025-09-24 11:10:45] Login attempt for user: ian
+[2025-09-24 11:10:45] User successfully logged in: ian
+[2025-09-24 11:10:45] User ian joined room: general
+[2025-09-24 11:10:45] User: ian sent message: [general] [2025-09-24 11:10:45.828]: SERVER: ian joined the room
+[2025-09-24 11:10:52] Login attempt for user: kamby
+[2025-09-24 11:10:53] User successfully logged in: kamby
+[2025-09-24 11:10:53] User kamby joined room: general
+[2025-09-24 11:10:53] User: ian sent message: [general] [2025-09-24 11:10:53.023]: SERVER: kamby joined the room
+[2025-09-24 11:10:53] User: kamby sent message: [general] [2025-09-24 11:10:53.023]: SERVER: kamby joined the room
+[2025-09-24 11:11:07] User: ian sent message: [general] [Wed Sep 24 11:11:07 CEST 2025]: kamby: hje
+[2025-09-24 11:11:07] Message from kamby in room general: hje
+[2025-09-24 11:13:06] Login attempt for user: kamby
+[2025-09-24 11:13:06] User successfully logged in: kamby
+[2025-09-24 11:13:06] User: ian sent message: [general] [2025-09-24 11:13:06.437]: SERVER: kamby left the room
+[2025-09-24 11:13:06] User kamby joined room: general
+[2025-09-24 11:13:06] User: ian sent message: [general] [2025-09-24 11:13:06.438]: SERVER: kamby joined the room
+[2025-09-24 11:13:06] User: kamby sent message: [general] [2025-09-24 11:13:06.438]: SERVER: kamby joined the room
+[2025-09-24 11:13:13] User: ian sent message: [general] [Wed Sep 24 11:13:13 CEST 2025]: kamby: hejsa
+[2025-09-24 11:13:13] Message from kamby in room general: hejsa
