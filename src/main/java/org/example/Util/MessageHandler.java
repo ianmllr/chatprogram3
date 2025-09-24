@@ -85,6 +85,8 @@ public class MessageHandler {
         }
     }
 
+    // Replace your handleLogin method in MessageHandler.java with this:
+
     private void handleLogin(MessageParser.ParsedMessage message, PrintWriter out) {
         String currentUsername = clientHandler.getLoggedInUsername();
         if (currentUsername != null) {
@@ -103,24 +105,24 @@ public class MessageHandler {
         String username = credentials[0].trim();
         String password = credentials[1];
 
-        if (username.isEmpty() || password.isEmpty()) {
-            out.println("Error: Username and password cannot be empty");
-            SimpleLogger.getInstance().log("Login attempt with empty credentials");
-            return;
-        }
-
         SimpleLogger.getInstance().log("Login attempt for user: " + username);
 
-        if (loginAuth.authenticateUser(username, password)) {
+        loginAuth.handleLogin(username, password, out, clientSocket);
+
+        boolean loginSuccessful = userMap.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+
+        if (loginSuccessful) {
             clientHandler.setLoggedInUsername(username);
 
-            out.println("Login successful! Welcome " + username);
+            System.out.println("DEBUG: Login successful. UserMap size: " + userMap.size());
+            for (User u : userMap.values()) {
+                System.out.println("  - " + u.getUsername());
+            }
+
             out.println("Available commands: /join <room>, /leave, /list_users, /list_rooms, /create_room, /send_dm, /help, /quit");
             SimpleLogger.getInstance().log("User successfully logged in: " + username);
             joinDefaultRoom(username, out);
-        } else {
-            out.println("Error: Invalid username or password");
-            SimpleLogger.getInstance().log("Failed login attempt for user: " + username);
         }
     }
 

@@ -18,6 +18,7 @@ public class ConfigLoader {
         }
     }
 
+
     public String getString(String key) {
         return properties.getProperty(key);
     }
